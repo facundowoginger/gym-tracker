@@ -1,28 +1,21 @@
+/* One fixed look: navy background with amber for anything active. */
 :root {
-  --bg: #f5f5f7;
-  --surface: #ffffff;
-  --text: #1c1c1e;
-  --muted: #6e6e73;
-  --border: #e3e3e8;
-  --accent: #ff5a1f;
-  --chart: #ff5a1f; /* validated against light surface */
+  --bg: #13213c; /* page */
+  --surface: #1a2b4c; /* pop-ups and menus only */
+  --text: #ffffff;
+  --muted: #8fa2c6;
+  --border: #22345a; /* thin divider lines */
+  --accent: #f5a524; /* amber */
+  --on-accent: #13213c; /* text and icons on amber */
+  --chart: #f5a524;
+  --danger: #ff6b6b;
 
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-  color-scheme: light dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: dark;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f0f11;
-    --surface: #1c1c1f;
-    --text: #f2f2f5;
-    --muted: #9a9aa2;
-    --border: #2c2c31;
-    --chart: #f05217; /* darker step that passes the dark-mode lightness check */
-  }
+  -webkit-tap-highlight-color: transparent;
 }
 
 * {

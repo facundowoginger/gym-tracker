@@ -4,6 +4,7 @@ import { weeklyHistory, personalRecords, sessionStats } from '../data/stats'
 import { toDisplay, formatWeight } from '../data/units'
 import ProgressChart from './ProgressChart'
 import ExerciseForm from './ExerciseForm'
+import { IconArrowLeft } from '@tabler/icons-react'
 
 const METRICS = [
   { key: 'heaviest', label: 'Heaviest', record: 'Heaviest weight' },
@@ -67,19 +68,21 @@ export default function ExerciseDetail({ exerciseId, unit, onBack }) {
 
   return (
     <div className="stack">
-      <div className="section-head">
-        <button className="btn btn-small" onClick={onBack}>
-          ‹ Back
-        </button>
-        <button className="btn btn-small" onClick={() => setEditing(true)}>
-          Edit
-        </button>
-      </div>
-
-      <div>
+      <div className="screen-head">
+        <div className="section-head">
+          <button className="link-btn" onClick={onBack}>
+            <IconArrowLeft size={16} aria-hidden="true" /> Back
+          </button>
+          <button className="link-btn quiet" onClick={() => setEditing(true)}>
+            Edit
+          </button>
+        </div>
         <h2 className="detail-title">{exercise.name}</h2>
-        <span className="tag">{exercise.muscleGroup}</span>
-        {exercise.bodyweight && <span className="tag">Bodyweight · weight = extra added</span>}
+        <p className="muted small">
+          {exercise.muscleGroup}
+          {history.length > 0 && ` · ${history.length} session${history.length > 1 ? 's' : ''}`}
+          {exercise.bodyweight && ' · bodyweight (weight = extra added)'}
+        </p>
       </div>
 
       {history.length === 0 ? (

@@ -44,6 +44,7 @@ export default function StartWorkout({ onStart }) {
 
   return (
     <div className="stack">
+      <h2>Workout</h2>
       <button className="btn btn-primary btn-big" onClick={() => onStart(null)}>
         Start empty workout
       </button>
@@ -51,7 +52,7 @@ export default function StartWorkout({ onStart }) {
       <section className="stack-sm">
         <div className="section-head">
           <h3>Routines</h3>
-          <button className="btn btn-small" onClick={() => setEditing('new')}>
+          <button className="link-btn" onClick={() => setEditing('new')}>
             + New routine
           </button>
         </div>
@@ -70,7 +71,7 @@ export default function StartWorkout({ onStart }) {
               </span>
             </div>
             <div className="row-actions">
-              <button className="btn btn-small" onClick={() => setEditing(r)}>
+              <button className="link-btn quiet" onClick={() => setEditing(r)}>
                 Edit
               </button>
               <button className="btn btn-small btn-primary" onClick={() => onStart(r)}>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { IconBarbell, IconListDetails, IconChartLine, IconSettings } from '@tabler/icons-react'
 import { getSetting } from './data/db'
 import WorkoutScreen from './screens/WorkoutScreen'
 import ExercisesScreen from './screens/ExercisesScreen'
@@ -7,10 +8,10 @@ import SettingsScreen from './screens/SettingsScreen'
 import './App.css'
 
 const TABS = [
-  { id: 'workout', label: 'Workout', icon: '🏋️' },
-  { id: 'exercises', label: 'Exercises', icon: '📋' },
-  { id: 'progress', label: 'Progress', icon: '📈' },
-  { id: 'settings', label: 'Settings', icon: '⚙️' },
+  { id: 'workout', label: 'Workout', Icon: IconBarbell },
+  { id: 'exercises', label: 'Exercises', Icon: IconListDetails },
+  { id: 'progress', label: 'Progress', Icon: IconChartLine },
+  { id: 'settings', label: 'Settings', Icon: IconSettings },
 ]
 
 function App() {
@@ -25,10 +26,6 @@ function App() {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Gym Tracker</h1>
-      </header>
-
       <main className="app-main">
         {unit && tab === 'workout' && <WorkoutScreen unit={unit} />}
         {unit && tab === 'exercises' && <ExercisesScreen unit={unit} />}
@@ -37,10 +34,16 @@ function App() {
       </main>
 
       <nav className="tab-bar">
-        {TABS.map((t) => (
-          <button key={t.id} className={t.id === tab ? 'tab active' : 'tab'} onClick={() => setTab(t.id)}>
-            <span className="tab-icon">{t.icon}</span>
-            <span>{t.label}</span>
+        {TABS.map(({ id, label, Icon }) => (
+          <button
+            key={id}
+            className={id === tab ? 'tab active' : 'tab'}
+            aria-current={id === tab ? 'page' : undefined}
+            onClick={() => setTab(id)}
+          >
+            <Icon size={22} stroke={1.75} aria-hidden="true" />
+            <span>{label}</span>
+            <span className="tab-indicator" />
           </button>
         ))}
       </nav>

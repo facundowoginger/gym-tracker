@@ -34,7 +34,7 @@ export default function ExercisePicker({ onPick, onClose, exclude = [] }) {
       <div className="overlay-inner stack-sm">
         <div className="section-head">
           <h2>Add exercise</h2>
-          <button className="btn btn-small" onClick={onClose}>
+          <button className="link-btn" onClick={onClose}>
             Close
           </button>
         </div>

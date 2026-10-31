@@ -1,3 +1,6 @@
+/* Continuous layout: no boxed cards. Sections are separated by thin lines,
+   numbers sit on underlines, and amber marks anything active. */
+
 .app {
   max-width: 560px;
   margin: 0 auto;
@@ -6,44 +9,32 @@
   flex-direction: column;
 }
 
-.app-header {
-  padding: 16px;
-  /* Room for the iPhone status bar / notch when installed to the home screen */
-  padding-top: calc(16px + env(safe-area-inset-top));
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-}
-
-.app-header h1 {
-  margin: 0;
-  font-size: 22px;
-  color: var(--accent);
-}
-
 .app-main {
   flex: 1;
-  padding: 24px 16px 96px;
+  /* Room for the iPhone status bar / notch when installed to the home screen */
+  padding: calc(20px + env(safe-area-inset-top)) 18px 110px;
 }
 
-.app-main h2 {
-  margin: 0 0 8px;
-}
-
-.muted {
-  color: var(--muted);
-  margin: 0 0 8px;
-}
-
-.small {
-  font-size: 14px;
+h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
 }
 
 h3 {
   margin: 0;
   font-size: 17px;
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--muted);
+  margin: 0;
+}
+
+.small {
+  font-size: 13px;
 }
 
 .nowrap {
@@ -54,13 +45,19 @@ h3 {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .stack-sm {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.stack-xs {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .section-head {
@@ -72,53 +69,84 @@ h3 {
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: 14px;
   align-items: center;
 }
 
+/* A "card" is now just a section of the page with a divider line above it */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px;
+  border-top: 1px solid var(--border);
+  padding: 14px 0 0;
 }
 
-/* Buttons and inputs */
+.screen-head {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Buttons */
 .btn {
-  background: var(--surface);
+  background: transparent;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 16px;
+  border-radius: 999px;
+  padding: 10px 18px;
   font-weight: 600;
   cursor: pointer;
 }
 
 .btn:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: default;
 }
 
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .btn-big {
-  padding: 16px;
+  padding: 15px;
   font-size: 17px;
-  border-radius: 14px;
 }
 
 .btn-small {
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 14px;
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--on-accent);
+}
+
+/* Text-only actions, e.g. "Finish →" and "+ Add set" */
+.link-btn {
+  background: none;
+  border: none;
+  padding: 6px 0;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.link-btn.quiet {
+  color: var(--muted);
+}
+
+.link-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .btn-danger-text {
   background: none;
   border: none;
-  color: #e5484d;
+  color: var(--danger);
   font-weight: 500;
   cursor: pointer;
   padding: 8px;
@@ -126,39 +154,51 @@ h3 {
 
 .icon-btn {
   background: none;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  width: 34px;
-  height: 34px;
+  border: none;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
   color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-btn:disabled {
   opacity: 0.3;
 }
 
+/* Inputs sit on an underline instead of in a box */
 .input {
   width: 100%;
   font: inherit;
   font-size: 16px; /* 16px stops iPhones zooming in on focus */
   color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid var(--border);
+  border-radius: 0;
+  padding: 10px 2px;
 }
 
 .input:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+select.input option {
+  background: var(--surface);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 14px;
+  gap: 4px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -167,15 +207,13 @@ h3 {
   align-items: center;
   gap: 8px;
   font-size: 14px;
+  accent-color: var(--accent);
 }
 
+/* Muscle group label: plain muted text */
 .tag {
   font-size: 12px;
   color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 1px 8px;
-  margin-left: 4px;
 }
 
 /* Routines and recent workouts */
@@ -186,6 +224,7 @@ h3 {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding-bottom: 14px;
 }
 
 .routine-info {
@@ -195,54 +234,90 @@ h3 {
   min-width: 0;
 }
 
-/* Set rows: Set | Previous | Weight | Reps | ✓ */
+/* Workout: one exercise after another */
+.exercise-block {
+  padding-top: 22px;
+}
+
+.exercise-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.exercise-name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Set rows: Set | Prev | Weight | Reps | ✓ */
 .set-grid {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) 72px 60px 44px;
-  gap: 8px;
+  grid-template-columns: 26px minmax(0, 1fr) 64px 52px 36px;
+  gap: 10px;
   align-items: center;
 }
 
 .set-header {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--muted);
+  padding-bottom: 6px;
 }
 
 .set-row {
-  border-radius: 10px;
-  padding: 4px 0;
-}
-
-.set-row.done {
-  background: color-mix(in srgb, #30a46c 14%, transparent);
+  border-top: 1px solid var(--border);
+  padding: 8px 0;
 }
 
 .set-num {
-  text-align: center;
   font-weight: 600;
+  color: var(--muted);
+}
+
+.set-row.done .set-num {
+  color: var(--accent);
 }
 
 .input.num {
-  padding: 10px 6px;
+  padding: 4px 0 3px;
   text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.input.num.filled {
+  border-bottom-color: var(--accent);
 }
 
 .check {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: transparent;
   color: var(--muted);
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 }
 
 .check.on {
-  background: #30a46c;
-  border-color: #30a46c;
-  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.entry-actions {
+  display: flex;
+  gap: 18px;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
 }
 
 /* Exercise picker */
@@ -257,36 +332,45 @@ h3 {
 .overlay-inner {
   max-width: 560px;
   margin: 0 auto;
-  padding: 16px;
+  padding: calc(16px + env(safe-area-inset-top)) 18px 24px;
 }
 
+/* Filters and measure switches: underlined text, not pills */
 .chips {
   display: flex;
-  gap: 6px;
+  gap: 18px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
 }
 
 .chip {
   flex: none;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: 999px;
-  padding: 6px 12px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  padding: 8px 0 7px;
   font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
   cursor: pointer;
+  margin-bottom: -1px;
 }
 
 .chip.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .create-btn {
-  border-style: dashed;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
   color: var(--accent);
+  font-weight: 600;
   text-align: left;
+  cursor: pointer;
 }
 
 .pick-list {
@@ -297,80 +381,70 @@ h3 {
 .pick-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
   text-align: left;
   background: none;
   border: none;
   border-bottom: 1px solid var(--border);
-  padding: 14px 4px;
+  padding: 14px 0;
   font-size: 16px;
   cursor: pointer;
 }
 
 .pick-row:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: default;
 }
 
 /* Workout summary */
 .summary-hero {
   text-align: center;
+  padding: 10px 0 4px;
 }
 
 .summary-emoji {
-  font-size: 48px;
+  font-size: 44px;
 }
 
 .pr-banner {
   font-weight: 700;
   color: var(--accent);
-  margin: 4px 0 0;
+  margin: 6px 0 0;
 }
 
 .badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px 14px;
 }
 
 .badge {
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
-  border-radius: 999px;
-  padding: 3px 10px;
   font-size: 13px;
   font-weight: 600;
 }
 
-/* Progress: stat tiles, chart, trends, bars */
-.stack-xs {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
+/* Progress: records, chart, trends, bars */
 .detail-title {
-  margin: 0 0 6px;
+  margin: 4px 0 4px;
 }
 
 .tile-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 14px 18px;
 }
 
 .tile {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .tile-value {
-  font-size: 20px;
+  font-size: 21px;
+  font-weight: 600;
 }
 
 .chart {
@@ -383,7 +457,6 @@ h3 {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 6px 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .change {
@@ -393,11 +466,11 @@ h3 {
 }
 
 .change.up {
-  color: #30a46c;
+  color: var(--accent);
 }
 
 .change.down {
-  color: #e5484d;
+  color: var(--danger);
 }
 
 .week-session {
@@ -406,19 +479,19 @@ h3 {
   gap: 10px;
   align-items: baseline;
   border-top: 1px solid var(--border);
-  padding-top: 6px;
+  padding-top: 7px;
 }
 
 .bar-row {
   display: grid;
-  grid-template-columns: 72px 1fr auto;
+  grid-template-columns: 76px 1fr auto;
   gap: 10px;
   align-items: center;
 }
 
 .bar-track {
-  height: 10px;
-  background: var(--bg);
+  height: 6px;
+  background: var(--border);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -430,58 +503,55 @@ h3 {
 }
 
 .error {
-  color: #e5484d;
+  color: var(--danger);
   margin: 0;
 }
 
-/* Settings */
+.ok {
+  color: var(--accent);
+  margin: 0;
+}
+
+/* Settings: kg / lbs switch as underlined text */
 .segmented {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 4px;
-  gap: 4px;
+  display: flex;
+  gap: 22px;
+  border-bottom: 1px solid var(--border);
 }
 
 .segment {
   background: none;
   border: none;
-  border-radius: 9px;
-  padding: 10px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 8px 0 7px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--muted);
   cursor: pointer;
 }
 
 .segment.active {
-  background: var(--accent);
-  color: #fff;
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
-.ok {
-  color: #30a46c;
-  margin: 0;
-}
-
-/* Confirm dialog */
+/* Pop-up dialogs keep a solid panel so they stand out */
 .dialog-backdrop {
   position: fixed;
   inset: 0;
   z-index: 20;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(5, 10, 20, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 18px;
 }
 
 .dialog {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 18px;
+  padding: 22px;
   width: 100%;
   max-width: 360px;
   display: flex;
@@ -500,12 +570,6 @@ h3 {
   margin-top: 6px;
 }
 
-.btn-danger {
-  background: #e5484d;
-  border-color: #e5484d;
-  color: #fff;
-}
-
 /* Bottom tab bar, sized for thumbs */
 .tab-bar {
   position: fixed;
@@ -516,29 +580,37 @@ h3 {
   max-width: 560px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: var(--surface);
+  background: var(--bg);
   border-top: 1px solid var(--border);
   padding-bottom: env(safe-area-inset-bottom);
+  z-index: 5;
 }
 
 .tab {
   background: none;
   border: none;
-  padding: 10px 0 12px;
+  padding: 10px 0 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  font-size: 12px;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--muted);
   cursor: pointer;
 }
 
-.tab-icon {
-  font-size: 22px;
+.tab-indicator {
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: transparent;
 }
 
 .tab.active {
   color: var(--accent);
-  font-weight: 600;
+}
+
+.tab.active .tab-indicator {
+  background: var(--accent);
 }

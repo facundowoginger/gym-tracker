@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { getExercises } from '../data/db'
-import { formatWeight } from '../data/units'
+import { formatWeight, toDisplay } from '../data/units'
 import { sessionStats } from '../data/stats'
+
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
 
 const RECORD_LABELS = {
   heaviest: 'Heaviest weight',
@@ -27,7 +29,8 @@ export default function WorkoutSummary({ workout, records, unit, onDone }) {
         <div className="summary-emoji">{prCount > 0 ? '🏆' : '💪'}</div>
         <h2>Workout saved</h2>
         <p className="muted">
-          {workout.name} · {workout.entries.length} exercises · {totalSets} sets · {formatWeight(totalVolume, unit)} lifted
+          {workout.name} · {plural(workout.entries.length, 'exercise')} · {plural(totalSets, 'set')} ·{' '}
+          {Math.round(toDisplay(totalVolume, unit)).toLocaleString()} {unit} lifted
         </p>
         {prCount > 0 && (
           <p className="pr-banner">

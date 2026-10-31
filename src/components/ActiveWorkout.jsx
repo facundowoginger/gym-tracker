@@ -5,9 +5,9 @@ import { newRecords } from '../data/stats'
 import { blankSet, makeEntry } from '../data/workoutDraft'
 import ExercisePicker from './ExercisePicker'
 import { useConfirm } from './useConfirm'
+import { IconArrowRight, IconCheck, IconX } from '@tabler/icons-react'
 
 const round1 = (n) => Math.round(n * 10) / 10
-const fmtDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 
 // The workout in progress. Every change goes through onChange, which saves the draft.
@@ -137,50 +137,44 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
   }
 
   return (
-    <div className="stack">
-      <div className="section-head">
+    <div>
+      <div className="screen-head section-head">
         <div>
           <h2>{draft.name}</h2>
-          <span className="muted small">Started {fmtTime(draft.startedAt)}</span>
+          <p className="muted small">Started {fmtTime(draft.startedAt)}</p>
         </div>
-        <button className="btn btn-primary" disabled={saving} onClick={finish}>
-          Finish
+        <button className="link-btn" disabled={saving} onClick={finish}>
+          Finish <IconArrowRight size={18} aria-hidden="true" />
         </button>
       </div>
 
       {draft.entries.length === 0 && (
-        <p className="muted">Add your first exercise to get going.</p>
+        <p className="muted" style={{ paddingTop: 22 }}>
+          Add your first exercise to get going.
+        </p>
       )}
 
       {draft.entries.map((entry, i) => {
         const ex = exercises[entry.exerciseId]
         if (!ex) return null
-        const history = histories[entry.exerciseId]
-        const last = history?.at(-1)
+        const last = histories[entry.exerciseId]?.at(-1)
         return (
-          <div className="card stack-sm" key={entry.exerciseId}>
-            <div className="section-head">
-              <div>
-                <strong>{ex.name}</strong> <span className="tag">{ex.muscleGroup}</span>
-              </div>
-              <button className="icon-btn" onClick={() => removeEntry(i)} aria-label={`Remove ${ex.name}`}>
-                ✕
-              </button>
+          <div className="exercise-block" key={entry.exerciseId}>
+            <div className="exercise-head">
+              <span className="exercise-name">{ex.name}</span>
+              <span className="row-actions">
+                <span className="tag">{ex.muscleGroup}</span>
+                <button className="icon-btn" onClick={() => removeEntry(i)} aria-label={`Remove ${ex.name}`}>
+                  <IconX size={18} aria-hidden="true" />
+                </button>
+              </span>
             </div>
-
-            <p className="muted small">
-              {history === undefined
-                ? ' '
-                : last
-                  ? `Last time (${fmtDate(last.date)}): ${last.sets.map((s) => `${showW(s.weight)}×${s.reps}`).join(', ')}`
-                  : 'First time doing this. This workout starts its log.'}
-            </p>
 
             <div className="set-grid set-header">
               <span>Set</span>
-              <span>Previous</span>
-              <span>{ex.bodyweight ? `+${unit}` : unit}</span>
-              <span>Reps</span>
+              <span>Prev</span>
+              <span style={{ textAlign: 'center' }}>{ex.bodyweight ? `+${unit}` : unit}</span>
+              <span style={{ textAlign: 'center' }}>Reps</span>
               <span />
             </div>
             {entry.sets.map((set, s) => {
@@ -189,9 +183,9 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
               return (
                 <div key={s} className={set.done ? 'set-grid set-row done' : 'set-grid set-row'}>
                   <span className="set-num">{s + 1}</span>
-                  <span className="muted small">{prev ? `${showW(prev.weight)} × ${prev.reps}` : '–'}</span>
+                  <span className="muted small">{prev ? `${showW(prev.weight)}×${prev.reps}` : '–'}</span>
                   <input
-                    className="input num"
+                    className={set.weight !== '' ? 'input num filled' : 'input num'}
                     type="number"
                     inputMode="decimal"
                     min="0"
@@ -202,7 +196,7 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
                     onChange={(e) => updateSet(i, s, { weight: e.target.value })}
                   />
                   <input
-                    className="input num"
+                    className={set.reps !== '' ? 'input num filled' : 'input num'}
                     type="number"
                     inputMode="numeric"
                     min="0"
@@ -217,17 +211,17 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
                     aria-label={`Complete set ${s + 1}`}
                     aria-pressed={set.done}
                   >
-                    ✓
+                    <IconCheck size={17} stroke={2.5} aria-hidden="true" />
                   </button>
                 </div>
               )
             })}
-            <div className="row-actions">
-              <button className="btn btn-small" onClick={() => addSet(i)}>
+            <div className="entry-actions">
+              <button className="link-btn" onClick={() => addSet(i)}>
                 + Add set
               </button>
               {entry.sets.length > 1 && (
-                <button className="btn btn-small" onClick={() => removeSet(i)}>
+                <button className="link-btn quiet" onClick={() => removeSet(i)}>
                   − Remove set
                 </button>
               )}
@@ -236,12 +230,14 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
         )
       })}
 
-      <button className="btn btn-big" onClick={() => setPicking(true)}>
-        + Add exercise
-      </button>
-      <button className="btn btn-danger-text" onClick={cancelWorkout}>
-        Cancel workout
-      </button>
+      <div className="stack-sm" style={{ paddingTop: 28 }}>
+        <button className="btn btn-big" onClick={() => setPicking(true)}>
+          + Add exercise
+        </button>
+        <button className="btn-danger-text" onClick={cancelWorkout}>
+          Cancel workout
+        </button>
+      </div>
       {dialog}
 
       {picking && (

@@ -28,7 +28,7 @@ export default function RoutineEditor({ routine, onSave, onDelete, onCancel }) {
     <div className="stack">
       <div className="section-head">
         <h2>{routine ? 'Edit routine' : 'New routine'}</h2>
-        <button className="btn btn-small" onClick={onCancel}>
+        <button className="link-btn quiet" onClick={onCancel}>
           Cancel
         </button>
       </div>
