@@ -22,6 +22,15 @@
   box-sizing: border-box;
 }
 
+/* iPhone home-screen apps with a see-through status bar measure the page from below
+   the status bar. Without this, the fixed tab bar sits higher on short screens than on
+   long, scrolling ones. Making the page at least screen height + status bar keeps it
+   at the very bottom on every tab. */
+html {
+  min-height: calc(100% + env(safe-area-inset-top));
+  background: var(--bg);
+}
+
 body {
   margin: 0;
   background: var(--bg);
