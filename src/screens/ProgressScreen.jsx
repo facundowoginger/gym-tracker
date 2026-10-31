@@ -25,7 +25,7 @@ export default function ProgressScreen({ unit }) {
   const { exercisesById, workouts } = data
   if (workouts.length === 0) {
     return (
-      <div className="stack-sm">
+      <div className="empty-center">
         <h2>Progress</h2>
         <p className="muted">Finish your first workout and your progress will show up here.</p>
       </div>

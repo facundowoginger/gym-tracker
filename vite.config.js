@@ -28,7 +28,7 @@ export default defineConfig(({ command, isPreview }) => ({
       },
       workbox: {
         // Cache the whole app so it opens with no signal at the gym.
-        globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
       },
     }),
   ],

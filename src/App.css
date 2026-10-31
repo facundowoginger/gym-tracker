@@ -570,6 +570,70 @@ select.input option {
   margin-top: 6px;
 }
 
+/* Opening screen: covers everything until tapped, then slides up */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.splash:focus {
+  outline: none;
+}
+
+.splash.leaving {
+  transform: translateY(-100%);
+}
+
+/* Bungee is only used on the opening screen. It has a single weight and only capitals. */
+.splash-title {
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-size: 46px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.splash-sub {
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: 0.35em;
+  padding-left: 0.35em; /* keeps the spaced letters visually centered */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash {
+    transition: none;
+  }
+}
+
+/* Empty screens: title and message in the middle of the page */
+.empty-center {
+  /* Fills the space between the top of the screen and the tab bar, without scrolling */
+  min-height: calc(100svh - 130px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.empty-center .muted {
+  max-width: 280px;
+}
+
 /* Bottom tab bar, sized for thumbs */
 .tab-bar {
   position: fixed;

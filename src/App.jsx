@@ -5,6 +5,7 @@ import WorkoutScreen from './screens/WorkoutScreen'
 import ExercisesScreen from './screens/ExercisesScreen'
 import ProgressScreen from './screens/ProgressScreen'
 import SettingsScreen from './screens/SettingsScreen'
+import Splash from './components/Splash'
 import './App.css'
 
 const TABS = [
@@ -17,9 +18,15 @@ const TABS = [
 function App() {
   const [tab, setTab] = useState('workout')
   const [unit, setUnit] = useState(null)
+  const [showSplash, setShowSplash] = useState(false)
 
   useEffect(() => {
-    getSetting('unit', 'lbs').then(setUnit)
+    // Show the opening screen on launch, unless a workout is already in progress:
+    // then go straight back to it.
+    Promise.all([getSetting('unit', 'lbs'), getSetting('activeWorkout', null)]).then(([u, active]) => {
+      setShowSplash(!active)
+      setUnit(u)
+    })
     // Ask the browser not to clear this app's data when the phone runs low on space.
     navigator.storage?.persist?.().catch(() => {})
   }, [])
@@ -47,6 +54,8 @@ function App() {
           </button>
         ))}
       </nav>
+
+      {showSplash && <Splash onDone={() => setShowSplash(false)} />}
     </div>
   )
 }
