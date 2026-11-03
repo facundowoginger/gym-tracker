@@ -808,6 +808,21 @@ button.streak-line {
   overflow: hidden;
 }
 
+/* On empty screens the plates belong to the whole screen, not the padded content
+   area, so they sit in the corner and against the edge. */
+.empty-center {
+  overflow: visible;
+}
+
+.empty-center .plates {
+  position: fixed;
+  inset: 0;
+}
+
+.empty-center .plate:nth-child(2) {
+  bottom: 140px !important; /* above the tab bar, against the left edge */
+}
+
 .splash > :not(.plates),
 .empty-center > :not(.plates),
 .summary-hero > :not(.plates):not(.confetti) {
