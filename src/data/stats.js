@@ -101,11 +101,80 @@ export function muscleSetsForWeek(workouts, exercisesById, weekKey) {
   return counts
 }
 
-// Which records a just-finished session broke, compared to the history before it.
-// Returns e.g. ['heaviest', 'best1RM'], so the app can celebrate them.
-export function newRecords(previousHistory, sets) {
-  if (previousHistory.length === 0) return []
-  const before = personalRecords(previousHistory)
-  const now = sessionStats(sets)
-  return Object.keys(before).filter((key) => now[key] > before[key].value)
+// Weight record: did these sets lift more than ever before on this exercise?
+// Only weight counts (an extra rep at the same weight is not a record), and an
+// exercise's first session is never a record. Returns { prev, now, gain } in kg, or null.
+export function weightRecord(previousHistory, sets) {
+  if (!previousHistory?.length || !sets.length) return null
+  const prev = Math.max(...previousHistory.map((s) => sessionStats(s.sets).heaviest))
+  const now = Math.max(...sets.map((s) => s.weight))
+  return now > prev + 0.01 ? { prev, now, gain: now - prev } : null
+}
+
+// ---------- Workout labels ----------
+
+const PUSH = new Set(['Chest', 'Tricep', 'Shoulders'])
+const PULL = new Set(['Back', 'Bicep', 'Shoulders'])
+
+// Name for a workout started empty, from the muscle groups it trained.
+// Core is ignored, so adding abs never changes the label.
+export function workoutLabel(entries, exercisesById) {
+  const groups = [
+    ...new Set(entries.map((e) => exercisesById[e.exerciseId]?.muscleGroup).filter((g) => g && g !== 'Core')),
+  ]
+  if (groups.length === 0) return 'Workout'
+  if (groups.length === 1 && groups[0] === 'Shoulders') return 'Workout'
+  if (groups.every((g) => g === 'Legs')) return 'Leg workout'
+  if (groups.every((g) => PUSH.has(g))) return 'Push workout'
+  if (groups.every((g) => PULL.has(g))) return 'Pull workout'
+  if (groups.every((g) => PUSH.has(g) || PULL.has(g))) return 'Upper workout'
+  return 'Workout'
+}
+
+// ---------- Days, weeks and streaks ----------
+
+const dayKey = (date) => new Date(date).toLocaleDateString('en-CA') // YYYY-MM-DD, local time
+
+// The day a workout counts for: when it started (older workouts only have a finish time).
+export const workoutDay = (w) => dayKey(w.startedAt ?? w.date)
+
+// Recent list: every workout from the last 2 weeks, or the last 3 if there are none.
+// `workouts` must be newest first.
+export function recentWorkouts(workouts, now = new Date()) {
+  const cutoff = new Date(now)
+  cutoff.setDate(cutoff.getDate() - 14)
+  const within = workouts.filter((w) => new Date(w.startedAt ?? w.date) >= cutoff)
+  return within.length ? within : workouts.slice(0, 3)
+}
+
+// The 7 days of the current week (Monday first), each with the workouts done that day.
+export function currentWeekDays(workouts, now = new Date()) {
+  const start = new Date(`${weekStart(now.toISOString())}T12:00:00`)
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start)
+    d.setDate(start.getDate() + i)
+    const key = dayKey(d)
+    return { key, date: d, isToday: key === dayKey(now), workouts: workouts.filter((w) => workoutDay(w) === key) }
+  })
+}
+
+// Workouts this week, and how many weeks in a row the weekly goal was reached.
+// The current week only adds to the streak once its goal is met; it never breaks it.
+export function weeklyStreak(workouts, goal, now = new Date()) {
+  const counts = new Map()
+  for (const w of workouts) {
+    const k = weekStart(w.startedAt ?? w.date)
+    counts.set(k, (counts.get(k) ?? 0) + 1)
+  }
+  const thisWeek = weekStart(now.toISOString())
+  const thisCount = counts.get(thisWeek) ?? 0
+  if (!goal) return { thisCount, streak: 0 }
+  let streak = thisCount >= goal ? 1 : 0
+  const d = new Date(`${thisWeek}T12:00:00`)
+  for (;;) {
+    d.setDate(d.getDate() - 7)
+    if ((counts.get(dayKey(d)) ?? 0) >= goal) streak++
+    else break
+  }
+  return { thisCount, streak }
 }

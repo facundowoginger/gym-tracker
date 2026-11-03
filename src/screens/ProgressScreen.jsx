@@ -4,13 +4,16 @@ import { summarizeByExercise, muscleSetsForWeek, weekStart } from '../data/stats
 import { toDisplay } from '../data/units'
 import { MUSCLE_GROUPS } from '../data/starterExercises'
 import ExerciseDetail from '../components/ExerciseDetail'
+import Plates from '../components/Plates'
+import { useNav, Screen } from '../components/nav'
 
 const shortDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
 // The Progress tab: this week at a glance, then every exercise you've logged with its trend.
 export default function ProgressScreen({ unit }) {
   const [data, setData] = useState(null)
-  const [openId, setOpenId] = useState(null)
+  const nav = useNav({ type: 'list' })
+  const openId = nav.view.type === 'exercise' ? nav.view.id : null
 
   useEffect(() => {
     if (openId) return
@@ -19,13 +22,20 @@ export default function ProgressScreen({ unit }) {
     )
   }, [openId])
 
-  if (openId) return <ExerciseDetail exerciseId={openId} unit={unit} onBack={() => setOpenId(null)} />
+  if (openId) {
+    return (
+      <Screen nav={nav}>
+        <ExerciseDetail exerciseId={openId} unit={unit} onBack={nav.pop} />
+      </Screen>
+    )
+  }
   if (!data) return null
 
   const { exercisesById, workouts } = data
   if (workouts.length === 0) {
     return (
       <div className="empty-center">
+        <Plates />
         <h2>Progress</h2>
         <p className="muted">Finish your first workout and your progress will show up here.</p>
       </div>
@@ -50,6 +60,7 @@ export default function ProgressScreen({ unit }) {
     .sort((a, b) => b[1].lastDate.localeCompare(a[1].lastDate))
 
   return (
+    <Screen nav={nav}>
     <div className="stack">
       <h2>Progress</h2>
 
@@ -94,7 +105,7 @@ export default function ProgressScreen({ unit }) {
             const diff = prev === undefined ? null : latest - prev
             const show = (v) => (key === 'maxReps' ? `${v} reps` : `${Math.round(toDisplay(v, unit) * 10) / 10} ${unit}`)
             return (
-              <button key={id} className="pick-row" onClick={() => setOpenId(id)}>
+              <button key={id} className="pick-row" onClick={() => nav.push({ type: 'exercise', id })}>
                 <span className="stack-xs">
                   <span>{ex.name}</span>
                   <span className="muted small">
@@ -111,5 +122,6 @@ export default function ProgressScreen({ unit }) {
         <p className="muted small">Change compares your top set with the session before.</p>
       </section>
     </div>
+    </Screen>
   )
 }

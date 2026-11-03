@@ -40,5 +40,5 @@ export default function WorkoutScreen({ unit }) {
     )
   }
 
-  return <StartWorkout onStart={async (routine) => update(await newDraft({ routine, unit }))} />
+  return <StartWorkout unit={unit} onStart={async (routine) => update(await newDraft({ routine, unit }))} />
 }

@@ -5,6 +5,7 @@ import { formatWeight } from '../data/units'
 import { MUSCLE_GROUPS } from '../data/starterExercises'
 import ExerciseDetail from '../components/ExerciseDetail'
 import ExerciseForm from '../components/ExerciseForm'
+import { useNav, Screen } from '../components/nav'
 
 const shortDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
@@ -14,8 +15,9 @@ export default function ExercisesScreen({ unit }) {
   const [summary, setSummary] = useState({})
   const [query, setQuery] = useState('')
   const [group, setGroup] = useState('All')
-  const [openId, setOpenId] = useState(null)
+  const nav = useNav({ type: 'list' })
   const [adding, setAdding] = useState(false)
+  const openId = nav.view.type === 'exercise' ? nav.view.id : null
 
   useEffect(() => {
     if (openId || adding) return
@@ -25,7 +27,13 @@ export default function ExercisesScreen({ unit }) {
     })
   }, [openId, adding])
 
-  if (openId) return <ExerciseDetail exerciseId={openId} unit={unit} onBack={() => setOpenId(null)} />
+  if (openId) {
+    return (
+      <Screen nav={nav}>
+        <ExerciseDetail exerciseId={openId} unit={unit} onBack={nav.pop} />
+      </Screen>
+    )
+  }
 
   const groups = ['All', ...new Set([...MUSCLE_GROUPS, ...exercises.map((e) => e.muscleGroup)])]
   const q = query.trim().toLowerCase()
@@ -34,6 +42,7 @@ export default function ExercisesScreen({ unit }) {
   )
 
   return (
+    <Screen nav={nav}>
     <div className="stack-sm">
       <div className="section-head">
         <h2>Exercises</h2>
@@ -54,12 +63,12 @@ export default function ExercisesScreen({ unit }) {
         {shown.map((e) => {
           const s = summary[e.id]
           return (
-            <button key={e.id} className="pick-row" onClick={() => setOpenId(e.id)}>
+            <button key={e.id} className="pick-row" onClick={() => nav.push({ type: 'exercise', id: e.id })}>
               <span className="stack-xs">
                 <span>{e.name}</span>
                 <span className="muted small">
                   {s
-                    ? `Last ${shortDate(s.lastDate)} · ${s.sessions.length} session${s.sessions.length > 1 ? 's' : ''} · best ${
+                    ? `Last ${shortDate(s.lastDate)} · best ${
                         e.bodyweight ? `${s.maxReps} reps` : formatWeight(s.heaviest, unit)
                       }`
                     : 'Not logged yet'}
@@ -80,5 +89,6 @@ export default function ExercisesScreen({ unit }) {
         />
       )}
     </div>
+    </Screen>
   )
 }

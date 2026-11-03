@@ -149,7 +149,6 @@ export default function ExerciseDetail({ exerciseId, unit, onBack }) {
                 ))}
               </div>
             ))}
-            <p className="muted small">Sets shown as weight × reps, in {unit}. Right column is total volume.</p>
           </section>
         </>
       )}

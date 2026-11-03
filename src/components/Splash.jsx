@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Plates from './Plates'
 
 // Opening screen: "Workout" with "START" underneath. Tapping anywhere slides it up
 // and off the top, revealing the app underneath.
@@ -23,6 +24,7 @@ export default function Splash({ onDone }) {
       onClick={start}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && start()}
     >
+      <Plates />
       <span className="splash-title">Workout</span>
       <span className="splash-sub">START</span>
     </div>

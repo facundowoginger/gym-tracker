@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getExercises, getExerciseHistory, saveWorkout } from '../data/db'
 import { toDisplay, fromInput } from '../data/units'
-import { newRecords } from '../data/stats'
+import { weightRecord, workoutLabel } from '../data/stats'
 import { blankSet, makeEntry } from '../data/workoutDraft'
 import ExercisePicker from './ExercisePicker'
 import { useConfirm } from './useConfirm'
@@ -120,16 +120,18 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
       }))
       .filter((e) => e.sets.length > 0)
 
-    // Compare against history from before this workout to find new records.
+    // Compare against history from before this workout to find weight records.
     const records = {}
     for (const e of entries) {
-      const before = await getExerciseHistory(e.exerciseId)
-      records[e.exerciseId] = newRecords(before, e.sets)
+      const rec = weightRecord(await getExerciseHistory(e.exerciseId), e.sets)
+      if (rec) records[e.exerciseId] = rec
     }
 
     const workout = await saveWorkout({
       date: new Date().toISOString(),
-      name: draft.name,
+      startedAt: draft.startedAt,
+      // Routine workouts keep the routine's name; empty ones are labeled by muscle groups.
+      name: draft.routineId ? draft.name : workoutLabel(entries, exercises),
       routineId: draft.routineId,
       entries,
     })
@@ -158,6 +160,11 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
         const ex = exercises[entry.exerciseId]
         if (!ex) return null
         const last = histories[entry.exerciseId]?.at(-1)
+        // Live record tag: heaviest ticked set vs. the heaviest ever lifted on this exercise.
+        const doneSets = entry.sets
+          .filter((s) => s.done)
+          .map((s) => ({ reps: Number(s.reps), weight: fromInput(Number(s.weight) || 0, unit) }))
+        const record = weightRecord(histories[entry.exerciseId], doneSets)
         return (
           <div className="exercise-block" key={entry.exerciseId}>
             <div className="exercise-head">
@@ -169,6 +176,11 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
                 </button>
               </span>
             </div>
+            {record && (
+              <div className="record-tag" role="status">
+                🏆 +{showW(record.gain)} {unit}
+              </div>
+            )}
 
             <div className="set-grid set-header">
               <span>Set</span>

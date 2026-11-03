@@ -4,7 +4,7 @@
 // What gets stored:
 //   exercises: { id, name, muscleGroup, bodyweight, createdAt }
 //   routines:  { id, name, exerciseIds: [id, ...] }
-//   workouts:  { id, date, name, routineId, exerciseIds: [...],
+//   workouts:  { id, date (finished), startedAt, name, routineId, exerciseIds: [...],
 //                entries: [{ exerciseId, sets: [{ reps, weight }] }] }
 //   settings:  { key, value }   e.g. { key: 'unit', value: 'kg' }
 //
@@ -144,7 +144,7 @@ export async function deleteRoutine(id) {
 // ---------- Workouts ----------
 
 // entries: [{ exerciseId, sets: [{ reps, weight }] }]
-export async function saveWorkout({ id, date, name = 'Workout', routineId = null, entries }) {
+export async function saveWorkout({ id, date, startedAt = null, name = 'Workout', routineId = null, entries }) {
   const cleaned = entries
     .map((e) => ({
       exerciseId: e.exerciseId,
@@ -157,6 +157,7 @@ export async function saveWorkout({ id, date, name = 'Workout', routineId = null
   const workout = {
     id: id ?? newId(),
     date: date ?? new Date().toISOString(),
+    startedAt,
     name,
     routineId,
     exerciseIds: cleaned.map((e) => e.exerciseId),

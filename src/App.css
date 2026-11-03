@@ -7,6 +7,7 @@
   min-height: 100svh;
   display: flex;
   flex-direction: column;
+  overflow-x: clip; /* hides screens while they slide in from the side */
 }
 
 .app-main {
@@ -15,11 +16,18 @@
   padding: calc(20px + env(safe-area-inset-top)) 18px 96px;
 }
 
+/* Screen titles use Bungee, the opening screen's font (it only has capitals) */
 h2 {
   margin: 0;
-  font-size: 26px;
-  font-weight: 600;
-  line-height: 1.15;
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.accent {
+  color: var(--accent);
 }
 
 h3 {
@@ -442,9 +450,12 @@ select.input option {
   gap: 1px;
 }
 
+/* Big numbers use Bungee in amber */
 .tile-value {
-  font-size: 21px;
-  font-weight: 600;
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--accent);
 }
 
 .chart {
@@ -570,6 +581,329 @@ select.input option {
   margin-top: 6px;
 }
 
+/* Rows that open something, and rows that only show information */
+.row-title {
+  font-weight: 600;
+}
+
+.row-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.pick-row.static {
+  cursor: default;
+}
+
+.summary-row {
+  align-items: center;
+}
+
+.detail-set {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding: 9px 0;
+  font-size: 15px;
+}
+
+/* Week strip and streak on the Workout tab */
+.week-strip {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0 10px;
+}
+
+.week-day {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.week-day:disabled {
+  cursor: default;
+}
+
+.week-letter {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.week-day.today .week-letter {
+  color: var(--text);
+}
+
+.week-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.week-dot.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.streak-line {
+  background: none;
+  border: none;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+
+button.streak-line {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goal-btn {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.goal-numbers {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0 4px;
+}
+
+.goal-num {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  width: 34px;
+  padding: 6px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.goal-num.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Live weight-record tag on an exercise while logging */
+.record-tag {
+  display: inline-block;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 3px 11px;
+  margin-bottom: 10px;
+}
+
+/* Calendar tab: one continuous month grid */
+.cal-weekdays {
+  position: sticky;
+  top: env(safe-area-inset-top); /* stays just below the iPhone status bar */
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 18px;
+  margin: 14px -18px 0;
+}
+
+.cal-month {
+  padding-top: 18px;
+}
+
+.cal-month-title {
+  font-size: 16px;
+  padding: 0 4px 8px;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 6px;
+  justify-items: center;
+}
+
+.cal-day {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cal-day.on {
+  background: var(--accent);
+  color: var(--on-accent);
+  cursor: pointer;
+}
+
+.cal-day.today {
+  box-shadow: inset 0 0 0 2px var(--text);
+}
+
+.cal-day.future {
+  color: #3b5078;
+}
+
+/* Faint weight plates behind calm screens */
+.plates {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--accent);
+}
+
+.plate {
+  position: absolute;
+  height: auto;
+}
+
+.splash,
+.empty-center,
+.summary-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.splash > :not(.plates),
+.empty-center > :not(.plates),
+.summary-hero > :not(.plates):not(.confetti) {
+  position: relative;
+}
+
+/* Record celebration on the workout summary */
+.summary-hero {
+  padding: 26px 0 8px;
+  margin: 0 -18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.celebrate-small {
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-size: 14px;
+  margin: 6px 0 0;
+}
+
+.celebrate-big {
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-size: 56px;
+  line-height: 1.05;
+  color: var(--accent);
+  margin: 4px 0 0;
+}
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.confetti span {
+  position: absolute;
+  top: -12px;
+  width: 7px;
+  height: 11px;
+  border-radius: 1px;
+  background: var(--accent);
+  opacity: 0;
+  animation: confetti-fall 1.8s ease-in forwards;
+}
+
+.confetti span.white {
+  background: #ffffff;
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--r));
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(260px) rotate(calc(var(--r) + 300deg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
+}
+
+/* Screen-to-screen slides: forward comes in from the right, back from the left */
+.screen.slide-forward {
+  animation: slide-from-right 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.screen.slide-back {
+  animation: slide-from-left 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slide-from-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen.slide-forward,
+  .screen.slide-back {
+    animation: none;
+  }
+}
+
 /* Opening screen: covers everything until tapped, then slides up */
 .splash {
   position: fixed;
@@ -643,7 +977,7 @@ select.input option {
   width: 100%;
   max-width: 560px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background: var(--bg);
   border-top: 1px solid var(--border);
   /* As low as possible: only keep enough room to stay clear of the iPhone's home bar */

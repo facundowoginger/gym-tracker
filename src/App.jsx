@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
-import { IconBarbell, IconListDetails, IconChartLine, IconSettings } from '@tabler/icons-react'
+import { IconBarbell, IconCalendar, IconListDetails, IconChartLine, IconSettings } from '@tabler/icons-react'
 import { getSetting } from './data/db'
 import WorkoutScreen from './screens/WorkoutScreen'
 import ExercisesScreen from './screens/ExercisesScreen'
 import ProgressScreen from './screens/ProgressScreen'
+import CalendarScreen from './screens/CalendarScreen'
 import SettingsScreen from './screens/SettingsScreen'
 import Splash from './components/Splash'
 import './App.css'
 
 const TABS = [
   { id: 'workout', label: 'Workout', Icon: IconBarbell },
-  { id: 'exercises', label: 'Exercises', Icon: IconListDetails },
+  { id: 'calendar', label: 'Calendar', Icon: IconCalendar },
   { id: 'progress', label: 'Progress', Icon: IconChartLine },
+  { id: 'exercises', label: 'Exercises', Icon: IconListDetails },
   { id: 'settings', label: 'Settings', Icon: IconSettings },
 ]
 
@@ -35,6 +37,7 @@ function App() {
     <div className="app">
       <main className="app-main">
         {unit && tab === 'workout' && <WorkoutScreen unit={unit} />}
+        {unit && tab === 'calendar' && <CalendarScreen unit={unit} />}
         {unit && tab === 'exercises' && <ExercisesScreen unit={unit} />}
         {unit && tab === 'progress' && <ProgressScreen unit={unit} />}
         {unit && tab === 'settings' && <SettingsScreen unit={unit} onUnitChange={setUnit} />}
