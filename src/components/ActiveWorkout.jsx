@@ -3,6 +3,7 @@ import { getExercises, getExerciseHistory, saveWorkout } from '../data/db'
 import { toDisplay, fromInput } from '../data/units'
 import { weightRecord, workoutLabel } from '../data/stats'
 import { blankSet, makeEntry } from '../data/workoutDraft'
+import { trackEvent } from '../data/analytics'
 import ExercisePicker from './ExercisePicker'
 import { useConfirm } from './useConfirm'
 import { IconArrowRight, IconCheck, IconX } from '@tabler/icons-react'
@@ -135,6 +136,7 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
       routineId: draft.routineId,
       entries,
     })
+    trackEvent('workout-finished', 'Workout finished')
     onFinish({ workout, records })
   }
 

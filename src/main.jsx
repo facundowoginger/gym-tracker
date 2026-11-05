@@ -8,6 +8,9 @@ import '@fontsource/fira-sans/latin-700.css'
 import '@fontsource/bungee/latin-400.css'
 import './index.css'
 import App from './App.jsx'
+import { loadAnalytics } from './data/analytics'
+
+loadAnalytics()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
