@@ -1,42 +1,95 @@
 import { useEffect, useState } from 'react'
-import { getExercises, getWorkouts } from '../data/db'
+import { getExercises, getWorkouts, getSetting, setSetting } from '../data/db'
 import { summarizeByExercise, muscleSetsForWeek, weekStart } from '../data/stats'
 import { toDisplay } from '../data/units'
 import { MUSCLE_GROUPS } from '../data/starterExercises'
 import ExerciseDetail from '../components/ExerciseDetail'
+import BodyWeightSection from '../components/BodyWeightSection'
+import { MeasurementsSection, MeasurementForm, PartDetail } from '../components/Measurements'
 import Plates from '../components/Plates'
 import { useNav, Screen } from '../components/nav'
 
 const shortDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
-// The Progress tab: this week at a glance, then every exercise you've logged with its trend.
+const SECTIONS = [
+  { key: 'lifts', label: 'Lifts' },
+  { key: 'weight', label: 'Body weight' },
+  { key: 'measurements', label: 'Measurements' },
+]
+
+// The Progress tab: Lifts, Body weight and Measurements. Remembers the last section used.
 export default function ProgressScreen({ unit }) {
-  const [data, setData] = useState(null)
   const nav = useNav({ type: 'list' })
-  const openId = nav.view.type === 'exercise' ? nav.view.id : null
+  const [section, setSection] = useState(null)
 
   useEffect(() => {
-    if (openId) return
+    getSetting('progressSection', 'lifts').then(setSection)
+  }, [])
+
+  if (!section) return null
+  const v = nav.view
+
+  let content
+  if (v.type === 'exercise') {
+    content = <ExerciseDetail exerciseId={v.id} unit={unit} onBack={nav.pop} />
+  } else if (v.type === 'measureForm') {
+    content = <MeasurementForm unit={unit} onBack={nav.pop} />
+  } else if (v.type === 'part') {
+    content = <PartDetail part={v.id} unit={unit} onBack={nav.pop} />
+  } else {
+    content = (
+      <div className="stack">
+        <div>
+          <h2>Progress</h2>
+          <div className="chips section-tabs" role="tablist" style={{ marginTop: 10 }}>
+            {SECTIONS.map((s) => (
+              <button
+                key={s.key}
+                role="tab"
+                aria-selected={section === s.key}
+                className={section === s.key ? 'chip active' : 'chip'}
+                onClick={() => {
+                  setSection(s.key)
+                  setSetting('progressSection', s.key)
+                }}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {section === 'lifts' && <LiftsSection unit={unit} onOpenExercise={(id) => nav.push({ type: 'exercise', id })} />}
+        {section === 'weight' && <BodyWeightSection unit={unit} />}
+        {section === 'measurements' && (
+          <MeasurementsSection
+            unit={unit}
+            onLog={() => nav.push({ type: 'measureForm' })}
+            onOpenPart={(id) => nav.push({ type: 'part', id })}
+          />
+        )}
+      </div>
+    )
+  }
+
+  return <Screen nav={nav}>{content}</Screen>
+}
+
+// This week at a glance, then every exercise you've logged with its trend.
+function LiftsSection({ unit, onOpenExercise }) {
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
     Promise.all([getExercises(), getWorkouts()]).then(([exercises, workouts]) =>
       setData({ exercisesById: Object.fromEntries(exercises.map((e) => [e.id, e])), workouts }),
     )
-  }, [openId])
+  }, [])
 
-  if (openId) {
-    return (
-      <Screen nav={nav}>
-        <ExerciseDetail exerciseId={openId} unit={unit} onBack={nav.pop} />
-      </Screen>
-    )
-  }
   if (!data) return null
-
   const { exercisesById, workouts } = data
   if (workouts.length === 0) {
     return (
-      <div className="empty-center">
+      <div className="empty-center in-section">
         <Plates />
-        <h2>Progress</h2>
         <p className="muted">Finish your first workout and your progress will show up here.</p>
       </div>
     )
@@ -60,11 +113,8 @@ export default function ProgressScreen({ unit }) {
     .sort((a, b) => b[1].lastDate.localeCompare(a[1].lastDate))
 
   return (
-    <Screen nav={nav}>
     <div className="stack">
-      <h2>Progress</h2>
-
-      <section className="card stack-sm">
+      <section className="stack-sm">
         <h3>This week</h3>
         <div className="tile-grid">
           <div className="tile">
@@ -105,7 +155,7 @@ export default function ProgressScreen({ unit }) {
             const diff = prev === undefined ? null : latest - prev
             const show = (v) => (key === 'maxReps' ? `${v} reps` : `${Math.round(toDisplay(v, unit) * 10) / 10} ${unit}`)
             return (
-              <button key={id} className="pick-row" onClick={() => nav.push({ type: 'exercise', id })}>
+              <button key={id} className="pick-row" onClick={() => onOpenExercise(id)}>
                 <span className="stack-xs">
                   <span>{ex.name}</span>
                   <span className="muted small">
@@ -122,6 +172,5 @@ export default function ProgressScreen({ unit }) {
         <p className="muted small">Change compares your top set with the session before.</p>
       </section>
     </div>
-    </Screen>
   )
 }

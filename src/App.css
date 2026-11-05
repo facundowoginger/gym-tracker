@@ -726,6 +726,200 @@ button.streak-line {
   margin-bottom: 10px;
 }
 
+/* Body weight and measurements */
+.big-number {
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-size: 34px;
+  color: var(--accent);
+  line-height: 1.1;
+}
+
+.bungee {
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-weight: 400;
+}
+
+.goal-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.edit-chip {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 4px;
+  cursor: pointer;
+}
+
+.goal-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.goal-bar > div {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.weigh-line {
+  background: none;
+  border: none;
+  padding: 8px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.log-diff {
+  display: inline-block;
+  min-width: 38px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.big-input {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.big-input .input {
+  font-family: 'Bungee', 'Fira Sans', sans-serif;
+  font-size: 26px;
+  width: 150px;
+}
+
+.step-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.weigh-days {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0 4px;
+}
+
+.weigh-day {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: none;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.weigh-day.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.dialog.weigh-in {
+  align-items: center;
+  text-align: center;
+}
+
+.dialog.weigh-in .btn-big {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.measure-row {
+  display: grid;
+  grid-template-columns: 1fr 90px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.empty-center.in-section {
+  min-height: calc(100svh - 260px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+/* Short message after a weigh-in, just above the tab bar */
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(76px + max(4px, env(safe-area-inset-bottom) - 16px));
+  width: calc(100% - 28px);
+  max-width: 520px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 14px;
+  color: var(--text);
+  cursor: pointer;
+  animation: toast-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.toast-emoji {
+  font-size: 26px;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+}
+
+/* Full-screen goal celebration */
+.celebrate-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--bg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.celebrate-content {
+  position: relative;
+  max-width: 360px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 /* Calendar tab: one continuous month grid */
 .cal-weekdays {
   position: sticky;

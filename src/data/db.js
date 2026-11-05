@@ -16,26 +16,36 @@ import { openDB } from 'idb'
 import { STARTER_EXERCISES, STARTER_VERSION } from './starterExercises'
 
 const DB_NAME = 'gym-tracker'
-const DB_VERSION = 1
+// Version 2 added body weight and body measurement logs.
+const DB_VERSION = 2
 
 let dbPromise
 
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        const exercises = db.createObjectStore('exercises', { keyPath: 'id' })
-        exercises.createIndex('byName', 'nameKey', { unique: true })
+      // Runs once per version step, so existing data is kept when the app updates.
+      upgrade(db, oldVersion) {
+        if (oldVersion < 1) {
+          const exercises = db.createObjectStore('exercises', { keyPath: 'id' })
+          exercises.createIndex('byName', 'nameKey', { unique: true })
 
-        db.createObjectStore('routines', { keyPath: 'id' })
+          db.createObjectStore('routines', { keyPath: 'id' })
 
-        const workouts = db.createObjectStore('workouts', { keyPath: 'id' })
-        workouts.createIndex('byDate', 'date')
-        // One workout can hold many exercises, so this index lets us find
-        // every workout that contains a given exercise.
-        workouts.createIndex('byExercise', 'exerciseIds', { multiEntry: true })
+          const workouts = db.createObjectStore('workouts', { keyPath: 'id' })
+          workouts.createIndex('byDate', 'date')
+          // One workout can hold many exercises, so this index lets us find
+          // every workout that contains a given exercise.
+          workouts.createIndex('byExercise', 'exerciseIds', { multiEntry: true })
 
-        db.createObjectStore('settings', { keyPath: 'key' })
+          db.createObjectStore('settings', { keyPath: 'key' })
+        }
+        if (oldVersion < 2) {
+          // bodyWeights:  { id, date: 'YYYY-MM-DD', kg }
+          db.createObjectStore('bodyWeights', { keyPath: 'id' }).createIndex('byDate', 'date')
+          // measurements: { id, date: 'YYYY-MM-DD', values: { chest: cm, rightArm: cm, ... } }
+          db.createObjectStore('measurements', { keyPath: 'id' }).createIndex('byDate', 'date')
+        }
       },
     }).then(async (db) => {
       await seedStarterExercises(db)
@@ -196,6 +206,58 @@ export async function getLastSession(exerciseId) {
   return history.at(-1) ?? null
 }
 
+// ---------- Body weight ----------
+
+// Oldest first.
+export async function getBodyWeights() {
+  return (await getDB()).getAllFromIndex('bodyWeights', 'byDate')
+}
+
+// One weigh-in per day: logging the same date again replaces it.
+export async function saveBodyWeight({ date, kg }) {
+  const db = await getDB()
+  const existing = await db.getFromIndex('bodyWeights', 'byDate', date)
+  const entry = { id: existing?.id ?? newId(), date, kg }
+  await db.put('bodyWeights', entry)
+  return entry
+}
+
+export async function updateBodyWeight(entry) {
+  await (await getDB()).put('bodyWeights', entry)
+}
+
+export async function deleteBodyWeight(id) {
+  await (await getDB()).delete('bodyWeights', id)
+}
+
+// ---------- Body measurements ----------
+
+// Oldest first.
+export async function getMeasurements() {
+  return (await getDB()).getAllFromIndex('measurements', 'byDate')
+}
+
+// Logging on a day that already has measurements adds to (or updates) that day's entry.
+export async function saveMeasurements({ date, values }) {
+  const db = await getDB()
+  const existing = await db.getFromIndex('measurements', 'byDate', date)
+  const entry = { id: existing?.id ?? newId(), date, values: { ...existing?.values, ...values } }
+  await db.put('measurements', entry)
+  return entry
+}
+
+// Change or remove (cm = null) one body part's value in one entry.
+export async function updateMeasurementValue(id, part, cm) {
+  const db = await getDB()
+  const entry = await db.get('measurements', id)
+  if (!entry) return
+  const values = { ...entry.values }
+  if (cm == null) delete values[part]
+  else values[part] = cm
+  if (Object.keys(values).length === 0) await db.delete('measurements', id)
+  else await db.put('measurements', { ...entry, values })
+}
+
 // ---------- Settings ----------
 
 export async function getSetting(key, fallback) {
@@ -209,7 +271,7 @@ export async function setSetting(key, value) {
 
 // ---------- Backup ----------
 
-const STORES = ['exercises', 'routines', 'workouts', 'settings']
+const STORES = ['exercises', 'routines', 'workouts', 'settings', 'bodyWeights', 'measurements']
 
 export async function exportAll() {
   const db = await getDB()
