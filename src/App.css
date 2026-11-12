@@ -258,6 +258,25 @@ select.input option {
 .exercise-name {
   font-size: 18px;
   font-weight: 600;
+  flex: 1;
+  min-width: 0;
+}
+
+.exercise-actions {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.exercise-block {
+  transition: background-color 0.4s;
+  margin: 0 -18px;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.exercise-block.flash {
+  background-color: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
 /* Set rows: Set | Prev | Weight | Reps | ✓ */

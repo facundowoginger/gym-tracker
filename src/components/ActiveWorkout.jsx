@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { getExercises, getExerciseHistory, saveWorkout } from '../data/db'
+import { getExercises, getExerciseHistory, saveWorkout, getRoutines, saveRoutine } from '../data/db'
 import { toDisplay, fromInput } from '../data/units'
 import { weightRecord, workoutLabel } from '../data/stats'
 import { blankSet, makeEntry } from '../data/workoutDraft'
 import { trackEvent } from '../data/analytics'
 import ExercisePicker from './ExercisePicker'
 import { useConfirm } from './useConfirm'
-import { IconArrowRight, IconCheck, IconX } from '@tabler/icons-react'
+import { IconArrowRight, IconArrowUp, IconArrowDown, IconCheck, IconX } from '@tabler/icons-react'
 
 const round1 = (n) => Math.round(n * 10) / 10
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
@@ -41,6 +41,18 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
     updateEntry(i, (e) => ({ ...e, sets: e.sets.map((x, k) => (k === s ? { ...x, ...patch } : x)) }))
   const addSet = (i) => updateEntry(i, (e) => ({ ...e, sets: [...e.sets, blankSet()] }))
   const removeSet = (i) => updateEntry(i, (e) => ({ ...e, sets: e.sets.slice(0, -1) }))
+  // Move an exercise up (-1) or down (+1). Its logged sets move with it.
+  const [moved, setMoved] = useState(null)
+  const moveEntry = (i, dir) => {
+    const j = i + dir
+    if (j < 0 || j >= draft.entries.length) return
+    const entries = [...draft.entries]
+    ;[entries[i], entries[j]] = [entries[j], entries[i]]
+    onChange({ ...draft, entries })
+    setMoved(entries[j].exerciseId) // briefly highlight where it landed
+    setTimeout(() => setMoved(null), 600)
+  }
+
   const removeEntry = async (i) => {
     const name = exercises[draft.entries[i].exerciseId]?.name ?? 'this exercise'
     const ok = await ask({
@@ -111,6 +123,29 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
       if (!ok) return
     }
 
+    // Started from a routine and the exercises were reordered? Offer to keep the new order.
+    if (draft.routineId) {
+      const routine = (await getRoutines()).find((r) => r.id === draft.routineId)
+      if (routine) {
+        const inRoutine = new Set(routine.exerciseIds)
+        const newOrder = draft.entries.map((e) => e.exerciseId).filter((id) => inRoutine.has(id))
+        const oldOrder = routine.exerciseIds.filter((id) => newOrder.includes(id))
+        if (newOrder.join() !== oldOrder.join()) {
+          const save = await ask({
+            title: `Save this new order to ${routine.name}?`,
+            message: `Next time, ${routine.name} will start in the order you used today.`,
+            confirmLabel: 'Save order',
+            cancelLabel: 'Just today',
+          })
+          if (save) {
+            // Exercises skipped today keep their place at the end; added ones aren't put in the routine.
+            const skipped = routine.exerciseIds.filter((id) => !newOrder.includes(id))
+            await saveRoutine({ ...routine, exerciseIds: [...newOrder, ...skipped] })
+          }
+        }
+      }
+    }
+
     setSaving(true)
     const entries = draft.entries
       .map((e) => ({
@@ -168,11 +203,28 @@ export default function ActiveWorkout({ draft, onChange, onFinish, onCancel }) {
           .map((s) => ({ reps: Number(s.reps), weight: fromInput(Number(s.weight) || 0, unit) }))
         const record = weightRecord(histories[entry.exerciseId], doneSets)
         return (
-          <div className="exercise-block" key={entry.exerciseId}>
+          <div className={moved === entry.exerciseId ? 'exercise-block flash' : 'exercise-block'} key={entry.exerciseId}>
             <div className="exercise-head">
-              <span className="exercise-name">{ex.name}</span>
-              <span className="row-actions">
-                <span className="tag">{ex.muscleGroup}</span>
+              <span className="exercise-name">
+                {ex.name} <span className="tag">{ex.muscleGroup}</span>
+              </span>
+              <span className="exercise-actions">
+                <button
+                  className="icon-btn"
+                  disabled={i === 0}
+                  onClick={() => moveEntry(i, -1)}
+                  aria-label={`Move ${ex.name} up`}
+                >
+                  <IconArrowUp size={18} aria-hidden="true" />
+                </button>
+                <button
+                  className="icon-btn"
+                  disabled={i === draft.entries.length - 1}
+                  onClick={() => moveEntry(i, 1)}
+                  aria-label={`Move ${ex.name} down`}
+                >
+                  <IconArrowDown size={18} aria-hidden="true" />
+                </button>
                 <button className="icon-btn" onClick={() => removeEntry(i)} aria-label={`Remove ${ex.name}`}>
                   <IconX size={18} aria-hidden="true" />
                 </button>
